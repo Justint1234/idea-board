@@ -3,16 +3,38 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 const NavBarStyles = styled.div`
-  background: red;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #457B9D;
+  height: 50px;
+  
+  a {
+    text-decoration: none;
+    padding-left: 10px;
+    color: white;
+    &:active {
+      color: red;
+    }
+  }
+
+  .right {
+    width: 15vw;
+    display: flex;
+    justify-content: space-around;
+  }
 `
 
 class NavBar extends Component {
   render() {
     return (
       <NavBarStyles id="nav-container" class="some-class">
-        <Link to="/">Go Home</Link>
-        <Link to="/login">Log-In</Link>
-        <Link to="/ideas">Ideas</Link>
+        <Link to="/">Ideas Board</Link>
+        <div className="right">
+          <Link to="/login">Log-In</Link>
+          <Link to="/ideas">Ideas</Link>
+        </div>
+        
       </NavBarStyles>
     );
   }
