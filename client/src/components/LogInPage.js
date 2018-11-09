@@ -31,6 +31,7 @@ class LogInPage extends Component {
     axios.post('/api/users', this.state.newUser).then(res => {
       // when we get that data back, we need to navigate to the new users page
       console.log(res.data)
+      this.props.history.push(`/users/${res.data._id}`)
     })
     
   }
