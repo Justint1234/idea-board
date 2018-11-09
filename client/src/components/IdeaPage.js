@@ -7,11 +7,11 @@ import styled from 'styled-components'
 
 const IdeaStyles = styled.div`
   display: flex;
-  position: relative; 
+  position: relative;
   flex-direction: column;
   width: 200px;
   height: 200px;
-  background: #F1FAEE;
+  background: #f1faee;
   margin: 10px 0;
   button {
     position: absolute;
@@ -19,7 +19,8 @@ const IdeaStyles = styled.div`
     right: 10px;
   }
 
-  input, textarea {
+  input,
+  textarea {
     background-color: transparent;
     border: none;
   }
@@ -38,7 +39,6 @@ const NewIdeaButton = styled.button`
   color: white;
   font-size: 1.3rem;
   padding: 7.5px 5px;
-
 `
 
 const IdeasContainerStyle = styled.div`
@@ -51,28 +51,7 @@ const IdeasContainerStyle = styled.div`
 class IdeaPage extends Component {
   state = {
     user: {},
-    ideas: [
-      {
-        id: 1,
-        title: 'hello',
-        description: 'world'
-      },
-      {
-        id: 2,
-        title: 'hola',
-        description: 'mundo'
-      },
-      {
-        id: 3,
-        title: 'goodnight',
-        description: 'moon'
-      },
-      {
-        id: 4,
-        title: 'greetings',
-        description: 'earthlings'
-      }
-    ]
+    ideas: []
   }
 
   componentDidMount() {
@@ -81,23 +60,98 @@ class IdeaPage extends Component {
     const userId = this.props.match.params.userId
     axios.get(`/api/users/${userId}`).then(res => {
       console.log(res.data)
-      this.setState({ user: res.data })
+      this.setState({
+        user: res.data,
+        ideas: res.data.ideas
+      })
     })
+  }
+
+  handleCreateNewIdea = () => {
+    const userId = this.props.match.params.userId
+    const payload = {
+      title: 'Idea Title',
+      description: 'Idea Description'
+    }
+    axios.post(`/api/users/${userId}/ideas`, payload).then(res => {
+      const newIdea = res.data
+      const newStateIdeas = [...this.state.ideas, newIdea]
+      this.setState({ ideas: newStateIdeas })
+    })
+  }
+
+  handleDelete = ideaId => {
+    // some unique value
+    axios.delete(`/api/ideas/${ideaId}`).then(() => {
+      //Remove the idea with ideaID from this.state.ideas
+      const newIdeas = [...this.state.ideas]
+      // Return only ideas that are NOT the id provided
+      const filtered = newIdeas.filter(idea => {
+        return idea._id !== ideaId // ! = =
+      })
+      // Take filtered data and set it to ideas
+      this.setState({ideas: filtered})
+    })
+  }
+
+  handleChange = (event, ideaId) => {
+    // const name = event.target.name
+    // const value = event.target.value
+    const { value, name } = event.target
+    const newIdeas = [...this.state.ideas]
+    const updatedVals = newIdeas.map(idea => {
+      if (idea._id === ideaId){
+        idea[name] = value
+      }
+      return idea
+    }) 
+
+    this.setState({ideas: updatedVals})
+  }
+
+  handleUpdate = (ideaId) => {
+    // Find the individual updated idea from this.state.ideas
+    const ideaToUpdate = this.state.ideas.find(idea => {
+      return idea._id === ideaId
+    })
+    // axios post the endpoint with updated data
+    axios.patch(`/api/ideas/${ideaId}`, ideaToUpdate).then(() => {
+      console.log("Updated Idea")  
+    })
+    // console .log saved
   }
 
   render() {
     return (
       <div>
         <h1>{this.state.user.username}'s Idea Page</h1>
-        <NewIdeaButton>New Idea</NewIdeaButton>
+        <NewIdeaButton onClick={this.handleCreateNewIdea}>
+          New Idea
+        </NewIdeaButton>
         <IdeasContainerStyle>
-          {this.state.ideas.map(idea => (
-            <IdeaStyles>
-              <input type="text" name="title" />
-              <textarea name="description" />
-              <button>X</button>
-            </IdeaStyles>
-          ))}
+          {this.state.ideas.map(idea => {
+            const deleteIdea = () => {
+              return this.handleDelete(idea._id)
+            }
+
+            return (
+              <IdeaStyles>
+                <input 
+                  onBlur={() => this.handleUpdate(idea._id)}
+                  onChange={(event) => this.handleChange(event, idea._id)} 
+                  type="text" name="title" 
+                  value={idea.title} 
+                />
+                <textarea 
+                  onBlur={() => this.handleUpdate(idea._id)}
+                  onChange={(event) => this.handleChange(event, idea._id)} 
+                  name="description" 
+                  value={idea.description} 
+                />
+                <button onClick={deleteIdea}>X</button>
+              </IdeaStyles>
+            )
+          })}
         </IdeasContainerStyle>
       </div>
     )
