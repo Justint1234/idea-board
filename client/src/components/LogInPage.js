@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
+import { Link } from 'react-router-dom'
 
 // TODO: SHOW ALL USERS
 // TODO: CREATE FORM TO CREATE USER
@@ -51,7 +52,7 @@ class LogInPage extends Component {
         <h3>All Users: </h3>
         { this.state.users.map((user) => (
           <div key={user._id}>
-            {user.username}
+            <Link to={`/users/${user._id}`}>{user.username}</Link>
           </div>
         )) }
 
