@@ -94,6 +94,33 @@ class IdeaPage extends Component {
     })
   }
 
+  handleChange = (event, ideaId) => {
+    // const name = event.target.name
+    // const value = event.target.value
+    const { value, name } = event.target
+    const newIdeas = [...this.state.ideas]
+    const updatedVals = newIdeas.map(idea => {
+      if (idea._id === ideaId){
+        idea[name] = value
+      }
+      return idea
+    }) 
+
+    this.setState({ideas: updatedVals})
+  }
+
+  handleUpdate = (ideaId) => {
+    // Find the individual updated idea from this.state.ideas
+    const ideaToUpdate = this.state.ideas.find(idea => {
+      return idea._id === ideaId
+    })
+    // axios post the endpoint with updated data
+    axios.patch(`/api/ideas/${ideaId}`, ideaToUpdate).then(() => {
+      console.log("Updated Idea")  
+    })
+    // console .log saved
+  }
+
   render() {
     return (
       <div>
@@ -109,8 +136,18 @@ class IdeaPage extends Component {
 
             return (
               <IdeaStyles>
-                <input type="text" name="title" value={idea.title} />
-                <textarea name="description" value={idea.description} />
+                <input 
+                  onBlur={() => this.handleUpdate(idea._id)}
+                  onChange={(event) => this.handleChange(event, idea._id)} 
+                  type="text" name="title" 
+                  value={idea.title} 
+                />
+                <textarea 
+                  onBlur={() => this.handleUpdate(idea._id)}
+                  onChange={(event) => this.handleChange(event, idea._id)} 
+                  name="description" 
+                  value={idea.description} 
+                />
                 <button onClick={deleteIdea}>X</button>
               </IdeaStyles>
             )
