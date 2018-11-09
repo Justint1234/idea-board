@@ -1,24 +1,35 @@
 import React, { Component } from 'react';
-
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom'
-import HomePage from './components/HomePage';
-import LoginPage from './components/LoginPage';
-import IdeaPage from './components/IdeaPage';
-import Navbar from './components/Navbar'
+import LogInPage from './components/LogInPage'
+import HomePage from './components/HomePage'
+import IdeaPage from './components/IdeaPage'
+import NavBar from './components/NavBar'
+import { createGlobalStyle } from 'styled-components'
+
+const Global = createGlobalStyle`
+  @import url('https://fonts.googleapis.com/css?family=Poppins');
+  
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #A8DADC;
+  }
+`
 
 class App extends Component {
   render() {
     return (
       <Router>
         <div>
-
-        <Navbar/>
-        <Switch>
-          <Route path='/login' component={LoginPage}></Route>
-          <Route path='/ideas' component={IdeaPage}></Route>
-          <Route path='/' component={HomePage}></Route>
-
-        </Switch>
+          <Global />
+          <NavBar />
+          <Switch>
+            <Route exact path="/login" component={LogInPage}/>
+            <Route exact path="/users/:userId" component={IdeaPage}/>
+            <Route path="/" component={HomePage}/>
+          </Switch>
+          <h6>Below</h6>
         </div>
       </Router>
     );
