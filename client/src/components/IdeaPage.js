@@ -51,28 +51,7 @@ const IdeasContainerStyle = styled.div`
 class IdeaPage extends Component {
   state = {
     user: {},
-    ideas: [
-      {
-        id: 1,
-        title: 'hello',
-        description: 'world'
-      },
-      {
-        id: 2,
-        title: 'hola',
-        description: 'mundo'
-      },
-      {
-        id: 3,
-        title: 'goodnight',
-        description: 'moon'
-      },
-      {
-        id: 4,
-        title: 'greetings',
-        description: 'earthlings'
-      }
-    ]
+    ideas: []
   }
 
   componentDidMount() {
@@ -81,7 +60,23 @@ class IdeaPage extends Component {
     const userId = this.props.match.params.userId
     axios.get(`/api/users/${userId}`).then(res => {
       console.log(res.data)
-      this.setState({ user: res.data })
+      this.setState({ 
+        user: res.data,
+        ideas: res.data.ideas
+      })
+    })
+  }
+
+  handleCreateNewIdea = () => {
+    const userId = this.props.match.params.userId
+    const payload = {
+      title: "Idea Title",
+      description: "Idea Description"
+    }
+    axios.post(`/api/users/${userId}/ideas`, payload).then(res => {
+      const newIdea = res.data
+      const newStateIdeas = [...this.state.ideas, newIdea]
+      this.setState({ideas: newStateIdeas})
     })
   }
 
@@ -89,12 +84,12 @@ class IdeaPage extends Component {
     return (
       <div>
         <h1>{this.state.user.username}'s Idea Page</h1>
-        <NewIdeaButton>New Idea</NewIdeaButton>
+        <NewIdeaButton onClick={this.handleCreateNewIdea}>New Idea</NewIdeaButton>
         <IdeasContainerStyle>
           {this.state.ideas.map(idea => (
             <IdeaStyles>
-              <input type="text" name="title" />
-              <textarea name="description" />
+              <input type="text" name="title" value={idea.title} />
+              <textarea name="description" value={idea.description}/>
               <button>X</button>
             </IdeaStyles>
           ))}
